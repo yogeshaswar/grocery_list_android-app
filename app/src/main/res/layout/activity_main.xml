@@ -7,7 +7,8 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity"
     android:padding="10dp"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:background="@color/app_primary">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -15,7 +16,7 @@
         android:padding="10dp"
         app:cardCornerRadius="6dp"
         app:cardElevation="6dp"
-        app:cardBackgroundColor="#EFEFEF">
+        app:cardBackgroundColor="@color/white">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -37,7 +38,7 @@
                 android:layout_height="wrap_content"
                 android:text="Add"
                 android:layout_gravity="end"
-                android:backgroundTint="@color/black"
+                android:backgroundTint="@color/app_secondary"
                 android:textStyle="bold"/>
         </LinearLayout>
     </androidx.cardview.widget.CardView>

@@ -70,6 +70,8 @@ private List<GroceryItem> groceryList = new ArrayList<>();
         mainActivityViewModel.addGroceryItem(groceryItem);
         etGroceryItem.setText("");
         etGroceryQuantity.setText("");
+        Toast.makeText(this, "Added Successfully", Toast.LENGTH_SHORT).show();
+
     }
 
     private void initiateUI() {
