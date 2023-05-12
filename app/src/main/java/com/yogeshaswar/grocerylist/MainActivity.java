@@ -1,7 +1,9 @@
 package com.yogeshaswar.grocerylist;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,10 +32,28 @@ private List<GroceryItem> groceryList = new ArrayList<>();
         initiateViewModel();
         initiateUI();
         btnClickHandler();
-        List<GroceryItem> groceryListTest = getGroceryList();
-        loadRecyclerView(groceryListTest);
-
+        loadRecyclerView(getGroceryList());
+        // delete on swipe functionality
+        deletegroceryItemOnSwipe();
     }
+
+    private void deletegroceryItemOnSwipe() {
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                GroceryItem groceryItem = getGroceryList().get(viewHolder.getAdapterPosition());
+                deleteGroceryItem(groceryItem);
+                loadRecyclerView(getGroceryList());
+                Toast.makeText(MainActivity.this, "Grocery Item Deleted", Toast.LENGTH_SHORT).show();
+            }
+        }).attachToRecyclerView(rvGroceryList);
+    }
+
 
     private void btnClickHandler() {
         btnAddGrocery.setOnClickListener((v) -> {
@@ -71,5 +91,9 @@ private List<GroceryItem> groceryList = new ArrayList<>();
 
     private void initiateViewModel() {
         mainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
+    }
+
+    private void deleteGroceryItem(GroceryItem groceryItem) {
+        mainActivityViewModel.removeGroceryItem(groceryItem);
     }
 }
