@@ -49,15 +49,41 @@ private List<GroceryItem> groceryList = new ArrayList<>();
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                AtomicBoolean decison = showAlert("Alert", "Do you want to delete this grocery item", "Yes", "No");
-                if(decison.equals(true)) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+                // Set the message show for the Alert time
+                builder.setMessage("Do you want to delete this item?");
+
+                // Set Alert Title
+                builder.setTitle("Alert");
+
+                // Set Cancelable false for when the user clicks on the outside the Dialog Box then it will remain show
+                builder.setCancelable(false);
+
+                // Set the positive button with yes name Lambda OnClickListener method is use of DialogInterface interface.
+                builder.setPositiveButton("Yes", (DialogInterface.OnClickListener) (dialog, which) -> {
+                    // When the user click yes button then app will close
                     GroceryItem groceryItem = getGroceryList().get(viewHolder.getAdapterPosition());
                     deleteGroceryItem(groceryItem);
                     loadRecyclerView(getGroceryList());
                     Toast.makeText(MainActivity.this, "Grocery Item Deleted", Toast.LENGTH_SHORT).show();
-                } else {
-                    return;
-                }
+                });
+
+                // Set the Negative button with No name Lambda OnClickListener method is use of DialogInterface interface.
+                builder.setNegativeButton("No", (DialogInterface.OnClickListener) (dialog, which) -> {
+                    // If user click no then dialog box is canceled.
+                    dialog.cancel();
+                    loadRecyclerView(getGroceryList());
+                });
+
+                // Create the Alert dialog
+                AlertDialog alertDialog = builder.create();
+                // Show the Alert Dialog box
+                alertDialog.show();
+
+
+
+
 
             }
         }).attachToRecyclerView(rvGroceryList);
@@ -124,9 +150,6 @@ private List<GroceryItem> groceryList = new ArrayList<>();
         // Set the positive button with yes name Lambda OnClickListener method is use of DialogInterface interface.
         builder.setPositiveButton(positiveActionText, (DialogInterface.OnClickListener) (dialog, which) -> {
             // When the user click yes button then app will close
-            Toast.makeText(this, "clicked yes!", Toast.LENGTH_SHORT).show();
-
-            loadRecyclerView(getGroceryList());
             userDecision.set(true);
         });
 
@@ -134,7 +157,6 @@ private List<GroceryItem> groceryList = new ArrayList<>();
         builder.setNegativeButton(negativeActionText, (DialogInterface.OnClickListener) (dialog, which) -> {
             // If user click no then dialog box is canceled.
             dialog.cancel();
-            loadRecyclerView(getGroceryList());
             userDecision.set(false);
         });
 
@@ -145,4 +167,16 @@ private List<GroceryItem> groceryList = new ArrayList<>();
         return userDecision;
    }
 
+//    @Override
+//    public void onBackPressed() {
+//
+//        super.onBackPressed();
+//        AtomicBoolean decision = showAlert("Alert", "Do you want to close the app?", "No", "Yes");
+//        if(decision.equals(true)) {
+//            return;
+//        } else {
+//            Toast.makeText(this, "closing", Toast.LENGTH_SHORT).show();
+//        }
+//        finish();
+//    }
 }
