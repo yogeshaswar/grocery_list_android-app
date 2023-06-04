@@ -1,12 +1,14 @@
 package com.yogeshaswar.grocerylist;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,6 +20,7 @@ import com.yogeshaswar.grocerylist.viewmodel.MainActivityViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MainActivity extends AppCompatActivity {
 private MainActivityViewModel mainActivityViewModel;
@@ -34,10 +37,10 @@ private List<GroceryItem> groceryList = new ArrayList<>();
         btnClickHandler();
         loadRecyclerView(getGroceryList());
         // delete on swipe functionality
-        deletegroceryItemOnSwipe();
+        deleteGroceryItemOnSwipe();
     }
 
-    private void deletegroceryItemOnSwipe() {
+    private void deleteGroceryItemOnSwipe() {
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
@@ -46,10 +49,16 @@ private List<GroceryItem> groceryList = new ArrayList<>();
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                GroceryItem groceryItem = getGroceryList().get(viewHolder.getAdapterPosition());
-                deleteGroceryItem(groceryItem);
-                loadRecyclerView(getGroceryList());
-                Toast.makeText(MainActivity.this, "Grocery Item Deleted", Toast.LENGTH_SHORT).show();
+                AtomicBoolean decison = showAlert("Alert", "Do you want to delete this grocery item", "Yes", "No");
+                if(decison.equals(true)) {
+                    GroceryItem groceryItem = getGroceryList().get(viewHolder.getAdapterPosition());
+                    deleteGroceryItem(groceryItem);
+                    loadRecyclerView(getGroceryList());
+                    Toast.makeText(MainActivity.this, "Grocery Item Deleted", Toast.LENGTH_SHORT).show();
+                } else {
+                    return;
+                }
+
             }
         }).attachToRecyclerView(rvGroceryList);
     }
@@ -98,4 +107,42 @@ private List<GroceryItem> groceryList = new ArrayList<>();
     private void deleteGroceryItem(GroceryItem groceryItem) {
         mainActivityViewModel.removeGroceryItem(groceryItem);
     }
+
+    private AtomicBoolean showAlert(String title ,String alertMessage, String positiveActionText, String negativeActionText) {
+        AtomicBoolean userDecision = new AtomicBoolean(false);
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+        // Set the message show for the Alert time
+        builder.setMessage(alertMessage);
+
+        // Set Alert Title
+        builder.setTitle(title);
+
+        // Set Cancelable false for when the user clicks on the outside the Dialog Box then it will remain show
+        builder.setCancelable(false);
+
+        // Set the positive button with yes name Lambda OnClickListener method is use of DialogInterface interface.
+        builder.setPositiveButton(positiveActionText, (DialogInterface.OnClickListener) (dialog, which) -> {
+            // When the user click yes button then app will close
+            Toast.makeText(this, "clicked yes!", Toast.LENGTH_SHORT).show();
+
+            loadRecyclerView(getGroceryList());
+            userDecision.set(true);
+        });
+
+        // Set the Negative button with No name Lambda OnClickListener method is use of DialogInterface interface.
+        builder.setNegativeButton(negativeActionText, (DialogInterface.OnClickListener) (dialog, which) -> {
+            // If user click no then dialog box is canceled.
+            dialog.cancel();
+            loadRecyclerView(getGroceryList());
+            userDecision.set(false);
+        });
+
+        // Create the Alert dialog
+        AlertDialog alertDialog = builder.create();
+        // Show the Alert Dialog box
+        alertDialog.show();
+        return userDecision;
+   }
+
 }
